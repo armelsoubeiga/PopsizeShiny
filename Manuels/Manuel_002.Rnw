@@ -1,0 +1,19 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{Sweave}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\title{Meanuel 002 version 001.\\ Rediger en Sweave \\Il est adresse eclusivement à mon prof\\ Remy DROUILHET}
+\author{Armel SOUBEIGA \\ Etudiant en M1 Statistique et Science des Données, (UGA)}
+
+\maketitle
+Ce projet contient trois (3) sous dossiers
+\begin{itemize}%
+\item Un dossier pour le package d'où se trouve l'installeur du packages en binair
+\item Un dossier contenant le shiny
+\item Un dossier contenant les manuels d'usage
+\end{itemize}
+Il faudra cependant change le chemin (directions) au données spatial (les .shp) à la ligne 62 du fichier server de shiny
+
+\end{document}

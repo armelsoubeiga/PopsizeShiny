@@ -1,0 +1,9 @@
+Package: popsize
+Type: Package
+Title: Estimation de la taille de population
+Version: 1.0
+Date: 2017-11-23
+Author: Centre Muraz / Centre de Calcul
+Maintainer: <armel.soubeiga@yahoo.fr>
+Description: Ce packages permet d'estimer le nombre de personnes dans une zonne bien localisée
+License: Version Essaie

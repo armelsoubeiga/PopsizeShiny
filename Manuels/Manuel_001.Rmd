@@ -1,0 +1,104 @@
+---
+title: "Manuel_001"
+author: "Armel SOUBEIGA"
+date: "Monday, December 04, 2017"
+output: pdf_document
+---
+
+# Presentation
+
+Ce projet  permet une analyse spatiale complete basée sur un algorithme appéle le krigeage contruit en package appellé *popsize*. La programmation contient également du *RCPP*, du *S3*.
+
+La page htm contient 7 ongle en elle même : 
+
+- Estimation
+
+. Conversion de longlat en UTM
+
+. Estimation
+
+- Cartographie
+
+. Visualisation de tout point de la région
+
+. Augmentation en fonction de l'echelle de visualisation
+
+- Statistique
+
+. Visualisation Données
+
+. Etude Descriptive
+
+1. Summary
+
+2. Histogramme
+
+3. boxplot
+
+4. Qqplot
+
+. Etude Variographique
+
+1. Nuée variographique
+
+2. Dispersion
+
+3. Variogramme estimé
+
+- Aides
+
+# Utilisation
+
+## Ongle **ESTIMATION**
+
+**Cette partie vous permet:**
+
+1. choisir la region dans laquelle vous desiré faire l'estimation
+
+  - La capitale du Burkina Faso: Ouagadougou
+  
+  - La deusiéme capitale du Burkina Faso: Bobo-Dioulasso
+  
+2. Choisir le type de coordonnés dont vous dispossé:
+
+  - longlat : Longitude en degrés décimaux, mesuré par rapport au méridien d’origine (Greenwich) et la  Latitude en degrés décimaux, mesuré par rapport à l’équateur
+                    
+  - UTM :les coordonnées en degrés décimaux, projetées en zone NORD 30 pour obtenir des coordonnées métriques afin de pouvoir effectuer les calculs de distances.
+                    
+3. Convertir vos coordonnées longlat en UTM
+                    
+   - UTM : projection Transverse Universelle de Mercator (en anglais Universal Transverse Mercator) est un type de projection conforme de la surface de la Terre.
+                    
+   - Système de référence : le Burkina Faso est situé dans le système World Geodetic System WGS84.
+   
+4. Estimation: en effet, cette méthode consistait, pour chaque lieudit renseigné d'estimer le nombre d’habitants situés dans un rayon de cent mètres (100 m), c’est-à-dire sur une superficie de 3 ha 14 a, soit 31 415 km² (31 415 000m²) et sur une circonférence de 628 km autour de ce lieu.",
+                    
+## Ongle **CARTOGRAPHIQUE**
+
+**Cette partie vous permet:**
+
+1.  Visualisez le lieudit dans la zone d'étude
+
+  - Entrez la longitude
+    
+  - Entrez la latitude
+    
+2. Ajustez votre visualisation:
+  
+  - Echelle de visualisation
+
+## Ongle **Statistique**
+
+
+**Cette partie est constitué de trois (3) sous ongle**
+
+
+1. La visualisation des données
+
+2. La statistique descriptive de la variable d'intêrret
+
+3. L'analyse spatiale des données
+
+## Ongle **Aides**
+
+Elle decrit l'aide à l'usage.

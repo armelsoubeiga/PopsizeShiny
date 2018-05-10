@@ -1,0 +1,202 @@
+---
+title: "Rapport_Projet"
+author: "Armel SOUBEIGA"
+date: "Sunday, December 6, 2017"
+output: pdf_document
+---
+
+
+# Construction du package
+
+## Description
+
+**popsize**
+
+Elle est construite à partir d'une fonction appellée *estimation*. Cette fonction conient des bout de code S3 et des données de type *.RData* compilé avec. Ces données seront utilisées dans la fonction du package et dans le *shiny* lorsqu'on appellera la library.
+
+
+
+
+```{r}
+#' @title Estimation de la taille de population
+#' @description Prend en parametres des coordonnées géographique et retour la taille de population à ce lieudit
+#' @return la taille de population
+#' @param Y0
+#' @param X0
+#' @export
+#'
+#'
+estimation <- function(X0,Y0)
+{
+  
+  data(MyData)
+  pop <- base[,17]
+  #matrice de distance
+  cords<-base[c("POINT_X","POINT_Y")]
+  S0<-c(X0,Y0)
+  cords<-as.matrix(rbind(S0,cords))
+  dist <- as.matrix(dist(cords)) 
+  
+  #Fonction S3
+  MatrixCor<- function(x,pa,ep, maybe = "some", other = "arguments", ...) {
+    UseMethod("MatrixCor")
+  }
+  
+  MatrixCor.matrix<-function(x,pa,ep)
+  {
+    po=mean(x)
+
+    for( i in 1:length(x)){
+      
+      dist1 <- x
+      
+      if(dist1[i]==0){
+        dist1[i]=0
+      }
+      
+      else if(dist1[i] > 0 & dist1[i] <= po){
+        dist1[i]= ep+(pa-ep)*(1.5*(dist1[i]/po)-0.5*(dist1[i]/po)^3)
+      }
+      
+      else if(dist1[i]> po){}
+      dist1[i]=pa
+    }
+    return(dist1)
+  }
+  pa=4593.973
+  ep=2267.514 
+  #covariance
+  dist2=MatrixCor(dist,pa,ep)
+  for( i in 1:length(dist2))
+    dist2[i]<- (pa-dist2[i]) 
+  
+  #calcul des coeficient (K*coef=k0)
+  #K
+  K1<- dist2[-1,-1]
+  K2<- cbind(K1,1)
+  v1<-rep(1,length(K1[,1]))
+  v2<-c(v1,0)
+  K<-rbind(K2,v2)
+  
+  #k0
+  kk<-dist2[1,]
+  k0<-c(kk[-1],1)
+  
+  #coef
+  coef<-k0%*%solve(K)
+  coefs<-coef[-length(coef)]
+  Z0<-sum(coefs%*%pop)
+  
+  #resultat
+  return(Z0)
+}
+```
+
+## Exemple
+
+Il faut dispose de coordonnées géographique en utm de la zone d'étude
+
+```{r}
+library("xtable")
+library("gstat")
+library("rgdal")
+library("sp")
+library("maptools")
+library('Rcpp')  
+library("popsize")
+data(MyData)
+Base <- base
+head(Base)
+```
+
+```{r}
+estimation(362889.041656,1238600.13535)
+```
+
+# shiny
+
+Dans le server du shiny on retrouve quelques petite fonction simple et d'autre faite avec du *RCPP*
+
+## Cartographie
+
+```{r}
+ comune<-readShapePoly("C:\\Users\\Armel soubeiga\\Desktop\\Mes COURS\\SSD_UGA\\M1\\R\\ProjetR_Armel\\Shinypopsize\\data\\Adm\\Bf_dept.shp")
+  par(mar=c(0, 0, 0, 0))
+  plot(comune[comune$NOMDEP=="BOBO-DIOULASSO",],col="gray")
+  points(362889.041656,1238600.13535,col="red",pch=20, cex=1)
+```
+
+## Statistique
+
+```{r}
+as.matrix(summary(Base$pop))
+```
+
+```{r}
+  par(mfrow=c(1,2))
+  hist(Base$pop,col="yellow",main="Histogramme",xlab="Densités",ylab="Frenquences")
+  hist(Base$pop,breaks=seq(0,400, by=1),main="Histogramme individuellement",xlab="Densités",ylab="Frenquences")
+```
+
+
+```{r}
+  boxplot(Base$pop,main="Boite à Moustache des densités",col="orange",ylab="Densit?")
+```
+
+```{r}
+qqnorm(Base$pop,pch="+",col="blue",main="le Qqplot de la densité",xlab="densité théorique",ylab="densité observées")
+  qqline(Base$pop,col="red")
+```
+
+```{r}
+ coordinates(Base)= ~POINT_X+POINT_Y
+  vgm<-variogram(Base$pop~1, Base, cloud=TRUE)
+  pp<-plot(vgm,col="blue",main="Nuéé Variographique omnidirectionnelle",id=TRUE)
+  abline(h=mean(vgm$gamma), col="red",lwd=2, lty=2)
+  vgmreg <- lm(vgm$gamma~vgm$dist)
+  abline(vgmreg, col=3, lwd=2)  
+```
+
+```{r}
+  bubble(Base,"pop",main="Dispersion des Lieudits en fonction de la densité")
+```
+
+```{r}
+  pop.vgm<- gstat::variogram(pop~ 1 , Base, cutoff=10000)
+  pop.fit<-gstat::fit.variogram(pop.vgm,vgm("Sph"))
+  plot(pop.vgm , pop.fit, main= "Variogramme estimé par un modéle spherique")
+```
+
+
+cppFunction('double sigmapop(NumericVector x) {
+  double sigma = sd(x);
+            return sigma;
+}')
+
+## Mean
+cppFunction('double meanpop(NumericVector x) {
+            int n = x.size();
+            double total = 0;
+            
+            for(int i = 0; i < n; ++i) {
+            total += x[i];
+            }
+            return total / n;
+            }')
+
+## Test normalité
+  mm <- meanpop(Base$pop)
+  sd <- sigmapop(Base$pop)
+  ks.test(Base$pop,"pnorm",mm,sd)
+
+
+
+```{r}
+plot(Base$pop,type="p",
+       main=paste("NUage de point"))
+  abline(h=0,col="blue",lty=2)
+  grid()
+```
+
+
+
